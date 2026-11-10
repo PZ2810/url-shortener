@@ -3,7 +3,7 @@ import string
 from functools import wraps
 from urllib.parse import urlparse
 
-from flask import Flask, request, redirect, jsonify
+from flask import Flask, request, redirect, jsonify, render_template
 import redis
 import psycopg2
 
@@ -113,7 +113,14 @@ def shorten_url():
     # Cache the mapping for fast redirects later
     cache.set(short_code, long_url)
 
-    return jsonify({"short_url": f"http://localhost:5000/{short_code}", "short_code": short_code}), 201
+    base_url = os.environ.get("BASE_URL", request.host_url.rstrip("/"))
+    return jsonify({"short_url": f"{base_url}/{short_code}", "short_code": short_code}), 201
+
+
+@app.route("/")
+def index():
+    return render_template("index.html")
+
 
 
 @app.route("/<short_code>")

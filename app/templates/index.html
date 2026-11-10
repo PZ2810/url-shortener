@@ -1,0 +1,1076 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>URL Shortener</title>
+  
+  <!-- Google Fonts: Schibsted Grotesk & Martian Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Martian+Mono:wght@400;700&family=Schibsted+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --paper: #E7EBE3;
+      --surface: #F6F8F3;
+      --ink: #17202A;
+      --cobalt: #2B3FD1;
+      --cobalt-dark: #2232A7;
+      --rule: #AEB8AB;
+      --alert: #B3261E;
+      --font-body: 'Schibsted Grotesk', system-ui, -apple-system, sans-serif;
+      --font-mono: 'Martian Mono', ui-monospace, monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--paper);
+      color: var(--ink);
+      font-family: var(--font-body);
+      font-size: 18px;
+      line-height: 1.55;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    a {
+      color: var(--cobalt);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+    a:hover {
+      color: var(--ink);
+    }
+
+    .container {
+      max-width: 1040px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* Top Bar */
+    header {
+      padding: 24px 0 16px;
+      border-bottom: 2px solid var(--ink);
+    }
+
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .wordmark {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--ink);
+      text-decoration: none;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 24px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: var(--ink);
+      text-decoration: none;
+      font-size: 16px;
+      font-weight: 500;
+    }
+    .nav-links a:hover {
+      color: var(--cobalt);
+    }
+
+    /* Section Spacing & Dividers */
+    section {
+      padding: 56px 0;
+      border-bottom: 1px solid var(--rule);
+    }
+
+    /* Hero Layout */
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 56px;
+      align-items: start;
+    }
+
+    .headline {
+      font-size: clamp(38px, 6vw, 64px);
+      line-height: 1.1;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      color: var(--ink);
+      margin-bottom: 16px;
+      max-width: 14ch;
+    }
+
+    .hero-sub {
+      font-size: 18px;
+      color: var(--ink);
+      margin-bottom: 32px;
+      max-width: 52ch;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    label {
+      font-size: 14px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--ink);
+    }
+
+    .input-row {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    input[type="text"], input[type="number"] {
+      width: 100%;
+      height: 48px;
+      padding: 0 16px;
+      background-color: var(--surface);
+      border: 1px solid var(--rule);
+      border-radius: 4px;
+      color: var(--ink);
+      font-family: var(--font-body);
+      font-size: 16px;
+      outline: none;
+    }
+
+    input[type="text"]:focus, input[type="number"]:focus {
+      border-color: var(--cobalt);
+      outline: 2px solid var(--cobalt);
+      outline-offset: 1px;
+    }
+
+    .btn-primary {
+      height: 48px;
+      padding: 0 24px;
+      background-color: var(--cobalt);
+      color: var(--paper);
+      border: none;
+      border-radius: 4px;
+      font-family: var(--font-body);
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 140px;
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      background-color: var(--cobalt-dark);
+    }
+
+    .btn-primary:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .form-note {
+      font-size: 14px;
+      color: var(--ink);
+      opacity: 0.75;
+      margin-top: 8px;
+    }
+
+    .error-box {
+      margin-top: 12px;
+      color: var(--alert);
+      font-size: 15px;
+      font-weight: 500;
+      min-height: 24px;
+    }
+
+    /* Ticket (Claim Ticket) */
+    .ticket-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .ticket {
+      width: 100%;
+      background-color: var(--cobalt);
+      color: var(--paper);
+      border-radius: 4px;
+      display: flex;
+      position: relative;
+      overflow: hidden;
+      transition: transform 400ms ease, opacity 400ms ease;
+    }
+
+    .ticket.animate-pop {
+      transform: translateY(-4px);
+    }
+
+    .ticket-main {
+      flex: 1;
+      padding: 24px;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .ticket-tag {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      opacity: 0.75;
+      margin-bottom: 8px;
+    }
+
+    .ticket-short-url {
+      font-family: var(--font-mono);
+      font-size: 20px;
+      font-weight: 700;
+      color: #FFFFFF;
+      word-break: break-all;
+      margin-bottom: 6px;
+    }
+
+    .ticket-original-url {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      opacity: 0.75;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      margin-bottom: 20px;
+    }
+
+    .btn-copy {
+      height: 40px;
+      padding: 0 16px;
+      background-color: var(--paper);
+      color: var(--ink);
+      border: none;
+      border-radius: 4px;
+      font-family: var(--font-body);
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      align-self: flex-start;
+    }
+
+    .btn-copy:hover {
+      background-color: #FFFFFF;
+    }
+
+    .btn-copy:focus {
+      outline: 2px solid #FFFFFF;
+      outline-offset: 2px;
+    }
+
+    .ticket-stub {
+      width: 100px;
+      background-color: rgba(0, 0, 0, 0.12);
+      border-left: 2px dashed rgba(231, 235, 227, 0.45);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 16px 8px;
+      text-align: center;
+    }
+
+    .stub-code {
+      font-family: var(--font-mono);
+      font-size: 30px;
+      font-weight: 700;
+      color: #FFFFFF;
+      line-height: 1.1;
+      word-break: break-all;
+    }
+
+    .stub-label {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      opacity: 0.75;
+      margin-top: 6px;
+    }
+
+    .ticket-caption {
+      font-size: 14px;
+      color: var(--ink);
+      opacity: 0.8;
+      margin-top: 10px;
+    }
+
+    /* Two Column Sections Below Hero */
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1.6fr;
+      gap: 56px;
+    }
+
+    .col-title {
+      font-size: 24px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 12px;
+    }
+
+    .col-desc {
+      font-size: 17px;
+      color: var(--ink);
+      opacity: 0.9;
+      max-width: 38ch;
+    }
+
+    /* Ruled Lists & Tables */
+    .ruled-list {
+      list-style: none;
+      width: 100%;
+    }
+
+    .ruled-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--rule);
+      gap: 16px;
+    }
+
+    .ruled-row:first-child {
+      border-top: 1px solid var(--rule);
+    }
+
+    .link-details {
+      min-width: 0;
+      flex: 1;
+    }
+
+    .link-short {
+      font-family: var(--font-mono);
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--cobalt);
+      text-decoration: none;
+      margin-bottom: 2px;
+      display: block;
+    }
+    .link-short:hover {
+      text-decoration: underline;
+    }
+
+    .link-original {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      color: var(--ink);
+      opacity: 0.75;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .btn-row-copy {
+      height: 36px;
+      padding: 0 14px;
+      background-color: var(--surface);
+      color: var(--ink);
+      border: 1px solid var(--rule);
+      border-radius: 4px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .btn-row-copy:hover {
+      background-color: #FFFFFF;
+      border-color: var(--ink);
+    }
+
+    .empty-state {
+      padding: 24px 0;
+      color: var(--ink);
+      opacity: 0.75;
+      font-style: italic;
+    }
+
+    /* Base62 Decoder Table */
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: var(--font-mono);
+      font-size: 15px;
+      margin-bottom: 24px;
+    }
+
+    .data-table th, .data-table td {
+      padding: 10px 14px;
+      text-align: left;
+      border-bottom: 1px solid var(--rule);
+    }
+
+    .data-table th {
+      font-weight: 700;
+      border-bottom: 2px solid var(--ink);
+      color: var(--ink);
+    }
+
+    .data-table tr.total-row td {
+      border-top: 2px solid var(--ink);
+      border-bottom: none;
+      font-weight: 700;
+      padding-top: 14px;
+    }
+
+    .try-calc {
+      background-color: var(--surface);
+      border: 1px solid var(--rule);
+      border-radius: 4px;
+      padding: 20px;
+    }
+
+    .try-calc-header {
+      font-size: 14px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 12px;
+      display: block;
+    }
+
+    .try-calc-row {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+    }
+
+    .try-calc-result {
+      font-family: var(--font-mono);
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--cobalt);
+    }
+
+    /* Numbered Steps */
+    .steps-list {
+      list-style: none;
+      counter-reset: step-counter;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .step-item {
+      counter-increment: step-counter;
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+    }
+
+    .step-num {
+      width: 32px;
+      height: 32px;
+      background-color: var(--ink);
+      color: var(--paper);
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-mono);
+      font-size: 14px;
+      font-weight: 700;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .step-text {
+      font-size: 17px;
+      color: var(--ink);
+    }
+
+    .step-text strong {
+      font-family: var(--font-mono);
+      font-weight: 700;
+      background-color: var(--surface);
+      padding: 1px 6px;
+      border-radius: 3px;
+    }
+
+    /* API Spec */
+    .code-block-wrapper {
+      background-color: var(--surface);
+      border: 1px solid var(--rule);
+      border-radius: 4px;
+      padding: 20px;
+      position: relative;
+      margin-bottom: 24px;
+    }
+
+    .code-block {
+      font-family: var(--font-mono);
+      font-size: 14px;
+      line-height: 1.6;
+      color: var(--ink);
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+
+    .btn-code-copy {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      height: 32px;
+      padding: 0 12px;
+      background-color: var(--paper);
+      color: var(--ink);
+      border: 1px solid var(--rule);
+      border-radius: 4px;
+      font-family: var(--font-body);
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .btn-code-copy:hover {
+      background-color: #FFFFFF;
+    }
+
+    .def-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .def-item {
+      display: flex;
+      gap: 16px;
+      font-size: 16px;
+    }
+
+    .def-term {
+      font-weight: 700;
+      width: 90px;
+      flex-shrink: 0;
+      color: var(--ink);
+    }
+
+    .def-desc {
+      color: var(--ink);
+      opacity: 0.9;
+    }
+
+    /* Footer */
+    footer {
+      padding: 40px 0 60px;
+      font-size: 15px;
+      color: var(--ink);
+      opacity: 0.85;
+    }
+
+    /* Reduced Motion */
+    @media (prefers-reduced-motion: reduce) {
+      .ticket {
+        transition: none !important;
+      }
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .hero-grid {
+        grid-template-columns: 1fr;
+        gap: 40px;
+      }
+
+      .two-col {
+        grid-template-columns: 1fr;
+        gap: 24px;
+      }
+
+      .headline {
+        max-width: 100%;
+      }
+
+      .ticket-stub {
+        width: 80px;
+      }
+
+      .stub-code {
+        font-size: 24px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <!-- Top Bar -->
+    <header>
+      <div class="top-bar">
+        <a href="/" class="wordmark">URL Shortener</a>
+        <nav>
+          <ul class="nav-links">
+            <li><a href="#how-it-works">How it works</a></li>
+            <li><a href="#api">API</a></li>
+            <li><a href="https://github.com/PZ2810/url-shortener" target="_blank" rel="noopener">Source</a></li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section>
+      <div class="hero-grid">
+        <!-- Form Left -->
+        <div>
+          <h1 class="headline">Paste a long link, get a short one.</h1>
+          <p class="hero-sub">Opening a short link checks Redis first, then falls back to PostgreSQL.</p>
+          
+          <form id="shortenForm" novalidate>
+            <div class="form-group">
+              <label for="urlInput">Destination Web Address</label>
+              <div class="input-row">
+                <input 
+                  type="text" 
+                  id="urlInput" 
+                  placeholder="https://example.com/a/very/long/address"
+                  autocomplete="off"
+                  autofocus
+                  required
+                >
+                <button type="submit" id="submitBtn" class="btn-primary">Shorten link</button>
+              </div>
+            </div>
+            <div id="errorArea" class="error-box" aria-live="polite"></div>
+            <p class="form-note">Limit: 10 links per minute.</p>
+          </form>
+        </div>
+
+        <!-- Claim Ticket Right -->
+        <div class="ticket-wrapper">
+          <div class="ticket" id="ticketCard" aria-live="polite">
+            <div class="ticket-main">
+              <div>
+                <span class="ticket-tag">Short Link</span>
+                <div class="ticket-short-url" id="ticketShortUrl">short.pranavcloud.in/21</div>
+                <div class="ticket-original-url" id="ticketLongUrl" title="https://example.com/a/very/long/address">https://example.com/a/very/long/address</div>
+              </div>
+              <button type="button" class="btn-copy" id="ticketCopyBtn">Copy link</button>
+            </div>
+            <div class="ticket-stub">
+              <span class="stub-code" id="ticketStubCode">21</span>
+              <span class="stub-label">Code</span>
+            </div>
+          </div>
+          <p class="ticket-caption" id="ticketCaption">Example. Shorten a link to get your own.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Your Links Section -->
+    <section>
+      <div class="two-col">
+        <div>
+          <h2 class="col-title">Your links</h2>
+          <p class="col-desc">Links created in this browser session are remembered here.</p>
+        </div>
+        <div>
+          <div id="linksContainer">
+            <p class="empty-state">Links you create here show up in this list.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- How the Code is Made Section -->
+    <section id="how-it-works">
+      <div class="two-col">
+        <div>
+          <h2 class="col-title">How the code is made</h2>
+          <p class="col-desc">Every link gets a number from the database. That number is written in base 62 (0-9, a-z, A-Z) so it stays short.</p>
+        </div>
+        <div>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Character</th>
+                <th>Value</th>
+                <th>Place</th>
+                <th>Adds</th>
+              </tr>
+            </thead>
+            <tbody id="decoderTableBody">
+              <!-- Dynamically populated from ticket's code -->
+            </tbody>
+          </table>
+
+          <div class="try-calc">
+            <label for="calcInput" class="try-calc-header">Try a number</label>
+            <div class="try-calc-row">
+              <input type="number" id="calcInput" value="125" min="0" max="999999999" style="max-width: 200px;">
+              <span class="try-calc-result" id="calcOutput">Code: 21</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- What Happens When a Link is Opened -->
+    <section>
+      <div class="two-col">
+        <div>
+          <h2 class="col-title">What happens when a link is opened</h2>
+          <p class="col-desc">A sequence designed for speed under high read traffic.</p>
+        </div>
+        <div>
+          <ol class="steps-list" id="stepsList">
+            <li class="step-item">
+              <span class="step-num">1</span>
+              <span class="step-text">The browser asks for <strong class="step-code-var">/21</strong>.</span>
+            </li>
+            <li class="step-item">
+              <span class="step-num">2</span>
+              <span class="step-text">Flask looks for <strong class="step-code-var">21</strong> in Redis.</span>
+            </li>
+            <li class="step-item">
+              <span class="step-num">3</span>
+              <span class="step-text">Found: skip to step 5.</span>
+            </li>
+            <li class="step-item">
+              <span class="step-num">4</span>
+              <span class="step-text">Not found: Flask reads the link from PostgreSQL and saves it in Redis.</span>
+            </li>
+            <li class="step-item">
+              <span class="step-num">5</span>
+              <span class="step-text">Flask answers with a 302 redirect to the original address.</span>
+            </li>
+          </ol>
+        </div>
+      </div>
+    </section>
+
+    <!-- API Section -->
+    <section id="api">
+      <div class="two-col">
+        <div>
+          <h2 class="col-title">API</h2>
+          <p class="col-desc">Standard JSON endpoint designed for automation and integration.</p>
+        </div>
+        <div>
+          <div class="code-block-wrapper">
+            <button type="button" class="btn-code-copy" id="copyCurlBtn">Copy curl</button>
+            <pre class="code-block" id="curlSnippet">curl -X POST https://short.pranavcloud.in/shorten \
+  -H "Content-Type: application/json" \
+  -d '{"url": "https://example.com"}'</pre>
+          </div>
+
+          <div class="def-list">
+            <div class="def-item">
+              <div class="def-term">Limit</div>
+              <div class="def-desc">10 requests per 60 seconds per IP.</div>
+            </div>
+            <div class="def-item">
+              <div class="def-term">Redirect</div>
+              <div class="def-desc">302 Found with original destination in Location header.</div>
+            </div>
+            <div class="def-item">
+              <div class="def-term">Storage</div>
+              <div class="def-desc">PostgreSQL relational store, cached in Redis in-memory.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+      <p>Source on <a href="https://github.com/PZ2810/url-shortener" target="_blank" rel="noopener">GitHub</a>. Built by Pranav Zhawar.</p>
+    </footer>
+  </div>
+
+  <script>
+    // Strict Base62 alphabet matching the backend Python app: 0-9, a-z, A-Z
+    const ALPHABET = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+    function base62Encode(num) {
+      num = BigInt(num);
+      if (num === 0n) return ALPHABET[0];
+      const result = [];
+      while (num > 0n) {
+        const rem = Number(num % 62n);
+        num = num / 62n;
+        result.push(ALPHABET[rem]);
+      }
+      return result.reverse().join("");
+    }
+
+    function base62Decode(code) {
+      let num = 0n;
+      for (let i = 0; i < code.length; i++) {
+        const idx = ALPHABET.indexOf(code[i]);
+        if (idx === -1) return 0n;
+        num = num * 62n + BigInt(idx);
+      }
+      return num;
+    }
+
+    // Elements
+    const form = document.getElementById("shortenForm");
+    const urlInput = document.getElementById("urlInput");
+    const submitBtn = document.getElementById("submitBtn");
+    const errorArea = document.getElementById("errorArea");
+    
+    const ticketCard = document.getElementById("ticketCard");
+    const ticketShortUrl = document.getElementById("ticketShortUrl");
+    const ticketLongUrl = document.getElementById("ticketLongUrl");
+    const ticketStubCode = document.getElementById("ticketStubCode");
+    const ticketCaption = document.getElementById("ticketCaption");
+    const ticketCopyBtn = document.getElementById("ticketCopyBtn");
+
+    const linksContainer = document.getElementById("linksContainer");
+    const decoderTableBody = document.getElementById("decoderTableBody");
+    const calcInput = document.getElementById("calcInput");
+    const calcOutput = document.getElementById("calcOutput");
+
+    const copyCurlBtn = document.getElementById("copyCurlBtn");
+    const curlSnippet = document.getElementById("curlSnippet");
+    const stepCodeVars = document.querySelectorAll(".step-code-var");
+
+    // LocalStorage Key
+    const STORAGE_KEY = "url_shortener_recent_links";
+
+    function getStoredLinks() {
+      try {
+        const item = localStorage.getItem(STORAGE_KEY);
+        return item ? JSON.parse(item) : [];
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function saveLink(shortUrl, longUrl) {
+      try {
+        let links = getStoredLinks();
+        links = links.filter(l => l.shortUrl !== shortUrl);
+        links.unshift({ shortUrl, longUrl, timestamp: Date.now() });
+        links = links.slice(0, 5); // Keep last 5
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(links));
+        renderLinks();
+      } catch (e) {}
+    }
+
+    function renderLinks() {
+      const links = getStoredLinks();
+      if (!links || links.length === 0) {
+        linksContainer.innerHTML = '<p class="empty-state">Links you create here show up in this list.</p>';
+        return;
+      }
+
+      let html = '<ul class="ruled-list">';
+      links.forEach((item, index) => {
+        html += `
+          <li class="ruled-row">
+            <div class="link-details">
+              <a href="${item.shortUrl}" target="_blank" rel="noopener" class="link-short">${item.shortUrl}</a>
+              <div class="link-original" title="${item.longUrl}">${item.longUrl}</div>
+            </div>
+            <button type="button" class="btn-row-copy" data-url="${item.shortUrl}">Copy</button>
+          </li>
+        `;
+      });
+      html += '</ul>';
+      linksContainer.innerHTML = html;
+
+      // Attach copy listeners
+      linksContainer.querySelectorAll(".btn-row-copy").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const url = btn.getAttribute("data-url");
+          copyText(url, btn);
+        });
+      });
+    }
+
+    function updateDecoderTable(code) {
+      if (!code) code = "21";
+      decoderTableBody.innerHTML = "";
+      
+      const len = code.length;
+      let total = 0n;
+
+      for (let i = 0; i < len; i++) {
+        const char = code[i];
+        const val = ALPHABET.indexOf(char);
+        const power = BigInt(len - 1 - i);
+        const place = 62n ** power;
+        const adds = BigInt(val) * place;
+        total += adds;
+
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${char}</td>
+          <td>${val}</td>
+          <td>${place.toString()}</td>
+          <td>${adds.toString()}</td>
+        `;
+        decoderTableBody.appendChild(tr);
+      }
+
+      const totalRow = document.createElement("tr");
+      totalRow.className = "total-row";
+      totalRow.innerHTML = `
+        <td colspan="2"></td>
+        <td>Link number</td>
+        <td>${total.toString()}</td>
+      `;
+      decoderTableBody.appendChild(totalRow);
+
+      // Update step explanation code variables
+      stepCodeVars.forEach(el => {
+        if (el.textContent.startsWith("/")) {
+          el.textContent = `/${code}`;
+        } else {
+          el.textContent = code;
+        }
+      });
+    }
+
+    function copyText(text, btnElement) {
+      if (!text) return;
+      navigator.clipboard.writeText(text).then(() => {
+        const originalText = btnElement.textContent;
+        btnElement.textContent = "Copied";
+        setTimeout(() => {
+          btnElement.textContent = originalText;
+        }, 2000);
+      }).catch(() => {
+        btnElement.textContent = "Failed";
+        setTimeout(() => {
+          btnElement.textContent = "Copy";
+        }, 2000);
+      });
+    }
+
+    // Handle Form Submit
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      errorArea.textContent = "";
+
+      let url = urlInput.value.trim();
+
+      // Rule: Empty
+      if (!url) {
+        errorArea.textContent = "Enter a web address to shorten.";
+        urlInput.focus();
+        return;
+      }
+
+      // Rule: Prepend https:// if missing
+      if (!/^https?:\/\//i.test(url)) {
+        url = "https://" + url;
+        urlInput.value = url;
+      }
+
+      // Disable button during request
+      submitBtn.disabled = true;
+
+      try {
+        const response = await fetch("/shorten", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ url: url })
+        });
+
+        const data = await response.json();
+
+        if (response.status === 201) {
+          // Success
+          const shortUrl = data.short_url;
+          const shortCode = data.short_code;
+
+          // Update Ticket
+          ticketShortUrl.textContent = shortUrl.replace(/^https?:\/\//, "");
+          ticketLongUrl.textContent = url;
+          ticketLongUrl.title = url;
+          ticketStubCode.textContent = shortCode;
+          ticketCaption.textContent = "Ticket created. Link is active and cached in Redis.";
+
+          // Animation pop
+          ticketCard.classList.remove("animate-pop");
+          void ticketCard.offsetWidth; // trigger reflow
+          ticketCard.classList.add("animate-pop");
+
+          // Update copy button target
+          ticketCopyBtn.onclick = () => copyText(shortUrl, ticketCopyBtn);
+
+          // Save to local storage & refresh list
+          saveLink(shortUrl, url);
+
+          // Update Base62 table for new code
+          updateDecoderTable(shortCode);
+
+          // Clear input
+          urlInput.value = "";
+        } else if (response.status === 400) {
+          // Rule: Invalid (400)
+          errorArea.textContent = "That isn't a web address. Start it with http:// or https://.";
+        } else if (response.status === 429) {
+          // Rule: Rate limit (429)
+          errorArea.textContent = "Limit reached: 10 links per minute. Try again shortly.";
+        } else {
+          errorArea.textContent = "The link wasn't created. Check your connection and try again.";
+        }
+      } catch (err) {
+        // Rule: Network or server error
+        errorArea.textContent = "The link wasn't created. Check your connection and try again.";
+      } finally {
+        submitBtn.disabled = false;
+      }
+    });
+
+    // Default Ticket Copy Button
+    ticketCopyBtn.addEventListener("click", () => {
+      copyText("https://" + ticketShortUrl.textContent, ticketCopyBtn);
+    });
+
+    // Copy Curl Button
+    copyCurlBtn.addEventListener("click", () => {
+      copyText(curlSnippet.textContent, copyCurlBtn);
+    });
+
+    // Try a number interactive field
+    calcInput.addEventListener("input", () => {
+      let val = calcInput.value.trim();
+      if (val === "" || isNaN(val) || Number(val) < 0) {
+        calcOutput.textContent = "Code: 0";
+        return;
+      }
+      const code = base62Encode(val);
+      calcOutput.textContent = `Code: ${code}`;
+    });
+
+    // Initialize Default State
+    document.addEventListener("DOMContentLoaded", () => {
+      updateDecoderTable("21");
+      renderLinks();
+    });
+  </script>
+</body>
+</html>
+

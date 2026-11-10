@@ -85,8 +85,16 @@ def test_is_valid_url_rejections():
 
 
 # ==========================================
-# 3. API Endpoint Tests
+# 3. API & Web Endpoint Tests
 # ==========================================
+def test_index_page(client):
+    """GET / should return 200 and serve HTML frontend."""
+    response = client.get("/")
+    assert response.status_code == 200
+    assert b"URL Shortener" in response.data
+    assert b"Paste a long link, get a short one." in response.data
+
+
 def test_health_check(client):
     """GET /health should return 200 and healthy status."""
     response = client.get("/health")
