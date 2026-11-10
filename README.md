@@ -14,42 +14,37 @@ It converts long URLs into compact alphanumeric codes using a **Base62** encodin
 - **Persistent Storage (PostgreSQL)**: Durable storage for URL mappings and auto-increment keys.
 - **Containerized & Orchestrated**: Zero-config deployment with Docker Compose, including startup health checks.
 
-### System Architecture Flow
+### System Architecture Flows
 
+The service implements the **Cache-Aside pattern**, where the **Flask application** orchestrates all communication between the client, Redis, and PostgreSQL (the databases never communicate directly with each other):
+
+#### 1. URL Shortening Flow (Write Path)
+When a user submits a long URL:
+```mermaid
+flowchart LR
+    User([User]) -->|"1. POST /shorten"| App["Flask App (app.py)"]
+    App -->|"2. INSERT url"| DB[("PostgreSQL Database")]
+    DB -->|"3. Returns auto-increment ID"| App
+    App -->|"4. Base62 encodes ID"| App
+    App -->|"5. SET short_code -> long_url"| Redis[("Redis Cache")]
+    App -->|"6. Returns short URL"| User
+```
+
+#### 2. URL Redirection Flow (Read Path / Cache-Aside)
+When a user visits a shortened link:
 ```mermaid
 flowchart TD
-    Client([Client / Browser])
-
-    subgraph AppService [Flask Web Service]
-        Flask[Flask Application :5000]
-        RateLimiter[Rate Limiter Decorator]
-        Base62[Base62 Encoder / Decoder]
-    end
-
-    subgraph Caching [In-Memory Cache]
-        Redis[(Redis Cache :6379)]
-    end
-
-    subgraph Persistence [Relational Database]
-        Postgres[(PostgreSQL :5432)]
-    end
-
-    %% URL Shortening Flow
-    Client -- "POST /shorten {url}" --> RateLimiter
-    RateLimiter -- "Check & incr quota" --> Redis
-    RateLimiter --> Flask
-    Flask -- "1. Insert & get ID" --> Postgres
-    Flask -- "2. Base62 Encode ID" --> Base62
-    Flask -- "3. Set short_code -> long_url" --> Redis
-    Flask -- "4. Return short_url" --> Client
-
-    %% Redirect Flow
-    Client -- "GET /:short_code" --> Flask
-    Flask -- "1. Fast Cache Lookup" --> Redis
-    Redis -. "Hit" .-> Flask
-    Redis -. "Miss" .-> Postgres
-    Postgres -. "Populate Redis" .-> Redis
-    Flask -- "302 Redirect (long_url)" --> Client
+    User([User]) -->|"1. GET /:short_code"| App["Flask App (app.py)"]
+    App -->|"2. Check cache (GET short_code)"| Redis[("Redis Cache")]
+    
+    Redis -- "3a. Cache Hit (found)" --> App
+    
+    Redis -. "3b. Cache Miss (not found)" .-> App
+    App -. "4. Query DB for long_url" .-> DB[("PostgreSQL Database")]
+    DB -. "5. Returns long_url" .-> App
+    App -. "6. Populate cache (SET)" .-> Redis
+    
+    App -->|"7. 302 Redirect"| Dest([Destination Website])
 ```
 
 ---
