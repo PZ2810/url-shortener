@@ -1,6 +1,7 @@
 import os
 import string
 from functools import wraps
+from urllib.parse import urlparse
 
 from flask import Flask, request, redirect, jsonify
 import redis
@@ -27,6 +28,17 @@ def get_db():
         user=os.environ.get("POSTGRES_USER", "postgres"),
         password=os.environ.get("POSTGRES_PASSWORD", "postgres"),
     )
+
+
+def is_valid_url(url):
+    """Validate that the URL is a string, within 2048 chars, and has a valid http/https scheme with a domain."""
+    if not isinstance(url, str):
+        return False
+    url = url.strip()
+    if not url or len(url) > 2048:
+        return False
+    parsed = urlparse(url)
+    return parsed.scheme in ("http", "https") and bool(parsed.netloc)
 
 
 def rate_limit(max_requests=10, window=60):
@@ -79,6 +91,12 @@ def shorten_url():
         return jsonify({"error": "Missing url field"}), 400
 
     long_url = data["url"]
+
+    # Validate URL format and length
+    if not is_valid_url(long_url):
+        return jsonify({"error": "Invalid URL. Must start with http:// or https:// and be under 2048 characters."}), 400
+
+    long_url = long_url.strip()
 
     # Save to PostgreSQL - the database assigns an auto-incrementing ID
     conn = get_db()
