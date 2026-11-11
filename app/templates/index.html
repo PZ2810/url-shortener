@@ -23,6 +23,15 @@
       --font-mono: 'Martian Mono', ui-monospace, monospace;
     }
 
+    html {
+      scroll-behavior: smooth;
+    }
+
+    ::selection {
+      background-color: rgba(43, 63, 209, 0.18);
+      color: var(--ink);
+    }
+
     * {
       box-sizing: border-box;
       margin: 0;
@@ -142,6 +151,19 @@
       gap: 12px;
     }
 
+    @media (min-width: 580px) {
+      .input-row {
+        flex-direction: row;
+        align-items: stretch;
+      }
+      .input-row input[type="text"] {
+        flex: 1;
+      }
+      .input-row .btn-primary {
+        flex-shrink: 0;
+      }
+    }
+
     input[type="text"], input[type="number"] {
       width: 100%;
       height: 48px;
@@ -153,12 +175,14 @@
       font-family: var(--font-body);
       font-size: 16px;
       outline: none;
+      transition: border-color 150ms ease, box-shadow 150ms ease;
     }
 
     input[type="text"]:focus, input[type="number"]:focus {
       border-color: var(--cobalt);
       outline: 2px solid var(--cobalt);
       outline-offset: 1px;
+      box-shadow: 0 0 0 3px rgba(43, 63, 209, 0.15);
     }
 
     .btn-primary {
@@ -176,10 +200,16 @@
       align-items: center;
       justify-content: center;
       min-width: 140px;
+      transition: background-color 150ms ease, transform 100ms ease;
     }
 
     .btn-primary:hover:not(:disabled) {
       background-color: var(--cobalt-dark);
+      transform: translateY(-1px);
+    }
+
+    .btn-primary:active:not(:disabled) {
+      transform: translateY(0);
     }
 
     .btn-primary:disabled {
@@ -195,11 +225,17 @@
     }
 
     .error-box {
-      margin-top: 12px;
+      margin-top: 0;
       color: var(--alert);
-      font-size: 15px;
-      font-weight: 500;
-      min-height: 24px;
+      font-size: 14px;
+      font-weight: 600;
+      min-height: 0;
+      transition: all 150ms ease;
+    }
+
+    .error-box:not(:empty) {
+      margin-top: 10px;
+      min-height: 22px;
     }
 
     /* Ticket (Claim Ticket) */
@@ -218,10 +254,28 @@
       position: relative;
       overflow: hidden;
       transition: transform 400ms ease, opacity 400ms ease;
+      box-shadow: 0 8px 24px rgba(43, 63, 209, 0.16);
     }
 
     .ticket.animate-pop {
       transform: translateY(-4px);
+    }
+
+    .ticket-notch {
+      position: absolute;
+      width: 18px;
+      height: 18px;
+      background-color: var(--paper);
+      border-radius: 50%;
+      right: 101px;
+      z-index: 3;
+      pointer-events: none;
+    }
+    .ticket-notch-top {
+      top: -9px;
+    }
+    .ticket-notch-bottom {
+      bottom: -9px;
     }
 
     .ticket-main {
@@ -233,13 +287,42 @@
       justify-content: space-between;
     }
 
+    .ticket-meta-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+      gap: 12px;
+    }
+
     .ticket-tag {
       font-family: var(--font-mono);
-      font-size: 12px;
+      font-size: 11px;
       letter-spacing: 0.08em;
       text-transform: uppercase;
-      opacity: 0.75;
-      margin-bottom: 8px;
+      color: var(--paper);
+      opacity: 0.85;
+    }
+
+    .ticket-status {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.75);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .status-pulse {
+      width: 6px;
+      height: 6px;
+      background-color: #4ADE80;
+      border-radius: 50%;
+      display: inline-block;
+      box-shadow: 0 0 6px rgba(74, 222, 128, 0.6);
     }
 
     .ticket-short-url {
@@ -263,7 +346,7 @@
 
     .btn-copy {
       height: 40px;
-      padding: 0 16px;
+      padding: 0 18px;
       background-color: var(--paper);
       color: var(--ink);
       border: none;
@@ -273,10 +356,16 @@
       font-weight: 700;
       cursor: pointer;
       align-self: flex-start;
+      transition: background-color 150ms ease, transform 100ms ease;
     }
 
     .btn-copy:hover {
       background-color: #FFFFFF;
+      transform: translateY(-1px);
+    }
+
+    .btn-copy:active {
+      transform: translateY(0);
     }
 
     .btn-copy:focus {
@@ -284,21 +373,29 @@
       outline-offset: 2px;
     }
 
+    .btn-copy.copied, .btn-row-copy.copied, .btn-code-copy.copied {
+      background-color: var(--ink) !important;
+      color: #FFFFFF !important;
+      border-color: var(--ink) !important;
+      font-weight: 700;
+    }
+
     .ticket-stub {
-      width: 100px;
-      background-color: rgba(0, 0, 0, 0.12);
-      border-left: 2px dashed rgba(231, 235, 227, 0.45);
+      width: 110px;
+      background-color: rgba(0, 0, 0, 0.15);
+      border-left: 2px dashed rgba(255, 255, 255, 0.35);
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       padding: 16px 8px;
       text-align: center;
+      position: relative;
     }
 
     .stub-code {
       font-family: var(--font-mono);
-      font-size: 30px;
+      font-size: 32px;
       font-weight: 700;
       color: #FFFFFF;
       line-height: 1.1;
@@ -308,8 +405,10 @@
     .stub-label {
       font-family: var(--font-mono);
       font-size: 11px;
-      letter-spacing: 0.08em;
+      letter-spacing: 0.1em;
       text-transform: uppercase;
+      font-weight: 700;
+      color: #FFFFFF;
       opacity: 0.75;
       margin-top: 6px;
     }
@@ -511,6 +610,7 @@
       font-family: var(--font-mono);
       font-weight: 700;
       background-color: var(--surface);
+      color: var(--ink);
       padding: 1px 6px;
       border-radius: 3px;
     }
@@ -612,6 +712,10 @@
         width: 80px;
       }
 
+      .ticket-notch {
+        right: 71px;
+      }
+
       .stub-code {
         font-size: 24px;
       }
@@ -666,9 +770,14 @@
         <!-- Claim Ticket Right -->
         <div class="ticket-wrapper">
           <div class="ticket" id="ticketCard" aria-live="polite">
+            <span class="ticket-notch ticket-notch-top"></span>
+            <span class="ticket-notch ticket-notch-bottom"></span>
             <div class="ticket-main">
               <div>
-                <span class="ticket-tag">Short Link</span>
+                <div class="ticket-meta-row">
+                  <span class="ticket-tag">Short Link</span>
+                  <span class="ticket-status"><span class="status-pulse"></span>ACTIVE IN REDIS</span>
+                </div>
                 <div class="ticket-short-url" id="ticketShortUrl">short.pranavcloud.in/21</div>
                 <div class="ticket-original-url" id="ticketLongUrl" title="https://example.com/a/very/long/address">https://example.com/a/very/long/address</div>
               </div>
@@ -953,18 +1062,46 @@
 
     function copyText(text, btnElement) {
       if (!text) return;
-      navigator.clipboard.writeText(text).then(() => {
+      const doSuccess = () => {
         const originalText = btnElement.textContent;
-        btnElement.textContent = "Copied";
+        btnElement.textContent = "Copied!";
+        btnElement.classList.add("copied");
         setTimeout(() => {
           btnElement.textContent = originalText;
-        }, 2000);
-      }).catch(() => {
+          btnElement.classList.remove("copied");
+        }, 1800);
+      };
+
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(doSuccess).catch(() => {
+          fallbackCopy(text, btnElement, doSuccess);
+        });
+      } else {
+        fallbackCopy(text, btnElement, doSuccess);
+      }
+    }
+
+    function fallbackCopy(text, btnElement, onSuccess) {
+      const textArea = document.createElement("textarea");
+      textArea.value = text;
+      textArea.style.position = "fixed";
+      textArea.style.left = "-9999px";
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+      try {
+        const successful = document.execCommand("copy");
+        if (successful && onSuccess) {
+          onSuccess();
+        } else {
+          btnElement.textContent = "Failed";
+          setTimeout(() => { btnElement.textContent = "Copy"; }, 1800);
+        }
+      } catch (err) {
         btnElement.textContent = "Failed";
-        setTimeout(() => {
-          btnElement.textContent = "Copy";
-        }, 2000);
-      });
+        setTimeout(() => { btnElement.textContent = "Copy"; }, 1800);
+      }
+      document.body.removeChild(textArea);
     }
 
     // Handle Form Submit
@@ -987,57 +1124,75 @@
         urlInput.value = url;
       }
 
+      // Quick structure check
+      const hostPart = url.replace(/^https?:\/\//i, "").split("/")[0].split("?")[0];
+      if (!hostPart.includes(".") && !hostPart.startsWith("localhost")) {
+        errorArea.textContent = "That isn't a web address. Start it with http:// or https:// (e.g. example.com).";
+        urlInput.focus();
+        return;
+      }
+
       // Disable button during request
       submitBtn.disabled = true;
 
       try {
-        const response = await fetch("/shorten", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ url: url })
-        });
+        let shortUrl, shortCode;
 
-        const data = await response.json();
-
-        if (response.status === 201) {
-          // Success
-          const shortUrl = data.short_url;
-          const shortCode = data.short_code;
-
-          // Update Ticket
-          ticketShortUrl.textContent = shortUrl.replace(/^https?:\/\//, "");
-          ticketLongUrl.textContent = url;
-          ticketLongUrl.title = url;
-          ticketStubCode.textContent = shortCode;
-          ticketCaption.textContent = "Ticket created. Link is active and cached in Redis.";
-
-          // Animation pop
-          ticketCard.classList.remove("animate-pop");
-          void ticketCard.offsetWidth; // trigger reflow
-          ticketCard.classList.add("animate-pop");
-
-          // Update copy button target
-          ticketCopyBtn.onclick = () => copyText(shortUrl, ticketCopyBtn);
-
-          // Save to local storage & refresh list
-          saveLink(shortUrl, url);
-
-          // Update Base62 table for new code
-          updateDecoderTable(shortCode);
-
-          // Clear input
-          urlInput.value = "";
-        } else if (response.status === 400) {
-          // Rule: Invalid (400)
-          errorArea.textContent = "That isn't a web address. Start it with http:// or https://.";
-        } else if (response.status === 429) {
-          // Rule: Rate limit (429)
-          errorArea.textContent = "Limit reached: 10 links per minute. Try again shortly.";
+        // If previewing file:/// directly in browser, provide instant simulated demo response
+        if (window.location.protocol === "file:") {
+          await new Promise(res => setTimeout(res, 200));
+          const simulatedId = Math.floor(Math.random() * 888000) + 120;
+          shortCode = base62Encode(simulatedId);
+          shortUrl = `https://short.pranavcloud.in/${shortCode}`;
         } else {
-          errorArea.textContent = "The link wasn't created. Check your connection and try again.";
+          const response = await fetch("/shorten", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ url: url })
+          });
+
+          if (response.status === 400) {
+            errorArea.textContent = "That isn't a web address. Start it with http:// or https://.";
+            return;
+          } else if (response.status === 429) {
+            errorArea.textContent = "Limit reached: 10 links per minute. Try again shortly.";
+            return;
+          } else if (!response.ok) {
+            errorArea.textContent = "The link wasn't created. Check your connection and try again.";
+            return;
+          }
+
+          const data = await response.json();
+          shortUrl = data.short_url;
+          shortCode = data.short_code;
         }
+
+        // Update Ticket
+        ticketShortUrl.textContent = shortUrl.replace(/^https?:\/\//, "");
+        ticketLongUrl.textContent = url;
+        ticketLongUrl.title = url;
+        ticketStubCode.textContent = shortCode;
+        ticketCaption.textContent = window.location.protocol === "file:"
+          ? "Preview ticket created. Run via Flask for real persistence."
+          : "Ticket created. Link is active and cached in Redis.";
+
+        // Animation pop
+        ticketCard.classList.remove("animate-pop");
+        void ticketCard.offsetWidth; // trigger reflow
+        ticketCard.classList.add("animate-pop");
+
+        // Update copy button target
+        ticketCopyBtn.onclick = () => copyText(shortUrl, ticketCopyBtn);
+
+        // Save to local storage & refresh list
+        saveLink(shortUrl, url);
+
+        // Update Base62 table for new code
+        updateDecoderTable(shortCode);
+
+        // Clear input
+        urlInput.value = "";
       } catch (err) {
-        // Rule: Network or server error
         errorArea.textContent = "The link wasn't created. Check your connection and try again.";
       } finally {
         submitBtn.disabled = false;
