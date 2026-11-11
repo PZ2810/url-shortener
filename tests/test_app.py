@@ -182,6 +182,29 @@ def test_redirect_not_found(client, monkeypatch):
     assert response.get_json() == {"error": "Short URL not found"}
 
 
+def test_redirect_not_found_html(client, monkeypatch):
+    """GET /:short_code with text/html Accept header returns custom 404 HTML page."""
+    monkeypatch.setattr("app.cache.get", lambda code: None)
+
+    mock_conn = MagicMock()
+    mock_cur = MagicMock()
+    mock_cur.fetchone.return_value = None
+    mock_conn.cursor.return_value = mock_cur
+    monkeypatch.setattr("app.get_db", lambda: mock_conn)
+
+    response = client.get("/nonexistent", headers={"Accept": "text/html,application/xhtml+xml"})
+    assert response.status_code == 404
+    assert b"Claim ticket not found" in response.data
+    assert b"nonexistent" in response.data
+
+
+def test_unknown_route_404_html(client):
+    """GET to unregistered route with text/html Accept header returns custom 404 HTML."""
+    response = client.get("/invalid/route/name", headers={"Accept": "text/html,application/xhtml+xml"})
+    assert response.status_code == 404
+    assert b"Claim ticket not found" in response.data
+
+
 def test_rate_limit_exceeded(client, monkeypatch):
     """POST /shorten returns 429 when IP exceeds rate limit."""
     monkeypatch.setattr("app.cache.get", lambda key: "10")

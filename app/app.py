@@ -142,6 +142,9 @@ def redirect_url(short_code):
     conn.close()
 
     if not result:
+        accept = request.headers.get("Accept", "")
+        if "text/html" in accept and not accept.startswith("*/*"):
+            return render_template("404.html", short_code=short_code), 404
         return jsonify({"error": "Short URL not found"}), 404
 
     # Found it in the database - cache it for next time
@@ -149,6 +152,14 @@ def redirect_url(short_code):
     cache.set(short_code, long_url)
 
     return redirect(long_url, code=302)
+
+
+@app.errorhandler(404)
+def not_found(e):
+    accept = request.headers.get("Accept", "")
+    if "text/html" in accept and not accept.startswith("*/*"):
+        return render_template("404.html", short_code=""), 404
+    return jsonify({"error": "Resource not found"}), 404
 
 
 @app.route("/health")

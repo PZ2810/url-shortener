@@ -5,6 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>URL Shortener</title>
   
+  <!-- Tab Favicon (Cobalt Link Icon) -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%232B3FD1'/%3E%3Cg transform='translate(4,4)' stroke='%23FFFFFF' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round' fill='none'%3E%3Cpath d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'/%3E%3Cpath d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'/%3E%3C/g%3E%3C/svg%3E">
+  <link rel="alternate icon" href="/static/favicon.svg" type="image/svg+xml">
+  
   <!-- Google Fonts: Schibsted Grotesk & Martian Mono -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -615,42 +619,87 @@
       border-radius: 3px;
     }
 
-    /* API Spec */
+    /* API Spec & Code Block */
     .code-block-wrapper {
       background-color: var(--surface);
       border: 1px solid var(--rule);
-      border-radius: 4px;
-      padding: 20px;
-      position: relative;
+      border-radius: 6px;
+      overflow: hidden;
       margin-bottom: 24px;
     }
 
-    .code-block {
+    .code-block-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 16px;
+      background-color: rgba(23, 32, 42, 0.03);
+      border-bottom: 1px solid var(--rule);
+    }
+
+    .code-lang-tag {
       font-family: var(--font-mono);
-      font-size: 14px;
-      line-height: 1.6;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
       color: var(--ink);
-      white-space: pre-wrap;
-      word-break: break-all;
+      opacity: 0.65;
     }
 
     .btn-code-copy {
-      position: absolute;
-      top: 14px;
-      right: 14px;
-      height: 32px;
+      height: 30px;
       padding: 0 12px;
       background-color: var(--paper);
       color: var(--ink);
       border: 1px solid var(--rule);
       border-radius: 4px;
       font-family: var(--font-body);
-      font-size: 12px;
+      font-size: 13px;
       font-weight: 700;
       cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: background-color 150ms ease, border-color 150ms ease, transform 100ms ease;
     }
+
     .btn-code-copy:hover {
       background-color: #FFFFFF;
+      border-color: var(--ink);
+      transform: translateY(-1px);
+    }
+
+    .btn-code-copy:active {
+      transform: translateY(0);
+    }
+
+    .btn-code-copy:focus {
+      outline: 2px solid var(--cobalt);
+      outline-offset: 1px;
+    }
+
+    .btn-code-copy.copied {
+      background-color: var(--ink) !important;
+      color: #FFFFFF !important;
+      border-color: var(--ink) !important;
+    }
+
+    .btn-code-copy .copy-icon {
+      stroke: currentColor;
+      flex-shrink: 0;
+    }
+
+    .code-block {
+      font-family: var(--font-mono);
+      font-size: 14px;
+      line-height: 1.65;
+      color: var(--ink);
+      padding: 18px 20px;
+      margin: 0;
+      white-space: pre-wrap;
+      word-break: break-word;
+      overflow-x: auto;
     }
 
     .def-list {
@@ -884,7 +933,16 @@
         </div>
         <div>
           <div class="code-block-wrapper">
-            <button type="button" class="btn-code-copy" id="copyCurlBtn">Copy curl</button>
+            <div class="code-block-header">
+              <span class="code-lang-tag">cURL</span>
+              <button type="button" class="btn-code-copy" id="copyCurlBtn" aria-label="Copy cURL command">
+                <svg class="copy-icon" viewBox="0 0 16 16" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="5" y="5" width="9" height="9" rx="1.5"></rect>
+                  <path d="M11 2H3.5A1.5 1.5 0 0 0 2 3.5V11"></path>
+                </svg>
+                <span class="copy-btn-text">Copy curl</span>
+              </button>
+            </div>
             <pre class="code-block" id="curlSnippet">curl -X POST https://short.pranavcloud.in/shorten \
   -H "Content-Type: application/json" \
   -d '{"url": "https://example.com"}'</pre>
@@ -1063,11 +1121,20 @@
     function copyText(text, btnElement) {
       if (!text) return;
       const doSuccess = () => {
-        const originalText = btnElement.textContent;
-        btnElement.textContent = "Copied!";
+        const textSpan = btnElement.querySelector(".copy-btn-text");
+        const originalText = textSpan ? textSpan.textContent : btnElement.textContent;
+        if (textSpan) {
+          textSpan.textContent = "Copied!";
+        } else {
+          btnElement.textContent = "Copied!";
+        }
         btnElement.classList.add("copied");
         setTimeout(() => {
-          btnElement.textContent = originalText;
+          if (textSpan) {
+            textSpan.textContent = originalText;
+          } else {
+            btnElement.textContent = originalText;
+          }
           btnElement.classList.remove("copied");
         }, 1800);
       };

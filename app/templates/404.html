@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>404 - Link Not Found | URL Shortener</title>
+  
+  <!-- Tab Favicon (Cobalt Link Icon) -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%232B3FD1'/%3E%3Cg transform='translate(4,4)' stroke='%23FFFFFF' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round' fill='none'%3E%3Cpath d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'/%3E%3Cpath d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'/%3E%3C/g%3E%3C/svg%3E">
+  <link rel="alternate icon" href="/static/favicon.svg" type="image/svg+xml">
+
+  <!-- Google Fonts: Schibsted Grotesk & Martian Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Martian+Mono:wght@400;700&family=Schibsted+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --paper: #E7EBE3;
+      --surface: #F6F8F3;
+      --ink: #17202A;
+      --cobalt: #2B3FD1;
+      --cobalt-dark: #2232A7;
+      --rule: #AEB8AB;
+      --alert: #B3261E;
+      --font-body: 'Schibsted Grotesk', system-ui, -apple-system, sans-serif;
+      --font-mono: 'Martian Mono', ui-monospace, monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--paper);
+      color: var(--ink);
+      font-family: var(--font-body);
+      font-size: 18px;
+      line-height: 1.55;
+      -webkit-font-smoothing: antialiased;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .container {
+      max-width: 1040px;
+      margin: 0 auto;
+      padding: 0 24px;
+      width: 100%;
+    }
+
+    header {
+      padding: 24px 0 16px;
+      border-bottom: 2px solid var(--ink);
+    }
+
+    .wordmark {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--ink);
+      text-decoration: none;
+    }
+
+    main {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      padding: 64px 0;
+    }
+
+    .error-grid {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 56px;
+      align-items: center;
+    }
+
+    .error-num {
+      font-family: var(--font-mono);
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--alert);
+      margin-bottom: 12px;
+      display: inline-block;
+    }
+
+    .headline {
+      font-size: clamp(38px, 5.5vw, 56px);
+      line-height: 1.1;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      color: var(--ink);
+      margin-bottom: 20px;
+    }
+
+    .desc {
+      font-size: 18px;
+      color: var(--ink);
+      opacity: 0.85;
+      margin-bottom: 32px;
+      max-width: 48ch;
+    }
+
+    .actions {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .btn-primary {
+      height: 48px;
+      padding: 0 24px;
+      background-color: var(--cobalt);
+      color: var(--paper);
+      border: none;
+      border-radius: 4px;
+      font-family: var(--font-body);
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      transition: background-color 150ms ease, transform 100ms ease;
+    }
+
+    .btn-primary:hover {
+      background-color: var(--cobalt-dark);
+      transform: translateY(-1px);
+      color: var(--paper);
+    }
+
+    /* Void Claim Ticket */
+    .void-ticket {
+      background-color: var(--surface);
+      border: 2px dashed var(--rule);
+      border-radius: 6px;
+      padding: 32px 28px;
+      position: relative;
+      box-shadow: 0 4px 16px rgba(23, 32, 42, 0.04);
+    }
+
+    .void-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--alert);
+      background-color: rgba(179, 38, 30, 0.08);
+      border: 1px solid rgba(179, 38, 30, 0.2);
+      padding: 4px 10px;
+      border-radius: 3px;
+      margin-bottom: 20px;
+    }
+
+    .void-title {
+      font-family: var(--font-mono);
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--ink);
+      margin-bottom: 12px;
+    }
+
+    .void-details {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      line-height: 1.8;
+      color: var(--ink);
+      opacity: 0.75;
+      border-top: 1px solid var(--rule);
+      padding-top: 16px;
+    }
+
+    .detail-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .detail-label {
+      opacity: 0.7;
+    }
+
+    .detail-val {
+      font-weight: 700;
+      color: var(--ink);
+    }
+
+    footer {
+      padding: 24px 0 36px;
+      border-top: 1px solid var(--rule);
+      font-size: 14px;
+      color: var(--ink);
+      opacity: 0.75;
+    }
+
+    @media (max-width: 768px) {
+      .error-grid {
+        grid-template-columns: 1fr;
+        gap: 40px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <header>
+      <a href="/" class="wordmark">URL Shortener</a>
+    </header>
+  </div>
+
+  <main>
+    <div class="container">
+      <div class="error-grid">
+        <div>
+          <span class="error-num">Error 404</span>
+          <h1 class="headline">Claim ticket not found.</h1>
+          <p class="desc">
+            The short code you requested does not exist or has expired. Redis cache and PostgreSQL storage returned no matching destination URL.
+          </p>
+          <div class="actions">
+            <a href="/" class="btn-primary">← Create a short link</a>
+          </div>
+        </div>
+
+        <div class="void-ticket">
+          <div class="void-badge">● Void / Expired Claim</div>
+          <div class="void-title">/{{ short_code if short_code else '404' }}</div>
+          <div class="void-details">
+            <div class="detail-row">
+              <span class="detail-label">Cache status:</span>
+              <span class="detail-val">REDIS MISS</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Database lookup:</span>
+              <span class="detail-val">NOT FOUND</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">HTTP response:</span>
+              <span class="detail-val">404 NOT FOUND</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <div class="container">
+    <footer>
+      <p>URL Shortener Service. Built by Pranav Zhawar.</p>
+    </footer>
+  </div>
+
+</body>
+</html>
+
