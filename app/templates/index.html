@@ -49,6 +49,7 @@
       font-size: 18px;
       line-height: 1.55;
       -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
     }
 
     a {
@@ -112,9 +113,13 @@
     /* Hero Layout */
     .hero-grid {
       display: grid;
-      grid-template-columns: 1.15fr 0.85fr;
+      grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
       gap: 56px;
       align-items: start;
+    }
+
+    .hero-grid > * {
+      min-width: 0;
     }
 
     .headline {
@@ -247,10 +252,14 @@
       display: flex;
       flex-direction: column;
       align-items: flex-start;
+      min-width: 0;
+      width: 100%;
     }
 
     .ticket {
       width: 100%;
+      max-width: 100%;
+      min-width: 0;
       background-color: var(--cobalt);
       color: var(--paper);
       border-radius: 4px;
@@ -289,6 +298,13 @@
       display: flex;
       flex-direction: column;
       justify-content: space-between;
+      overflow: hidden;
+    }
+
+    .ticket-content {
+      min-width: 0;
+      max-width: 100%;
+      overflow: hidden;
     }
 
     .ticket-meta-row {
@@ -335,7 +351,11 @@
       font-weight: 700;
       color: #FFFFFF;
       word-break: break-all;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
       margin-bottom: 6px;
+      max-width: 100%;
     }
 
     .ticket-original-url {
@@ -346,6 +366,7 @@
       text-overflow: ellipsis;
       white-space: nowrap;
       margin-bottom: 20px;
+      max-width: 100%;
     }
 
     .btn-copy {
@@ -386,6 +407,7 @@
 
     .ticket-stub {
       width: 110px;
+      flex-shrink: 0;
       background-color: rgba(0, 0, 0, 0.15);
       border-left: 2px dashed rgba(255, 255, 255, 0.35);
       display: flex;
@@ -427,8 +449,12 @@
     /* Two Column Sections Below Hero */
     .two-col {
       display: grid;
-      grid-template-columns: 1fr 1.6fr;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.6fr);
       gap: 56px;
+    }
+
+    .two-col > * {
+      min-width: 0;
     }
 
     .col-title {
@@ -446,9 +472,15 @@
     }
 
     /* Ruled Lists & Tables */
+    #linksContainer {
+      min-width: 0;
+      width: 100%;
+    }
+
     .ruled-list {
       list-style: none;
       width: 100%;
+      min-width: 0;
     }
 
     .ruled-row {
@@ -458,6 +490,7 @@
       padding: 14px 0;
       border-bottom: 1px solid var(--rule);
       gap: 16px;
+      min-width: 0;
     }
 
     .ruled-row:first-child {
@@ -467,6 +500,7 @@
     .link-details {
       min-width: 0;
       flex: 1;
+      overflow: hidden;
     }
 
     .link-short {
@@ -477,6 +511,10 @@
       text-decoration: none;
       margin-bottom: 2px;
       display: block;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      max-width: 100%;
     }
     .link-short:hover {
       text-decoration: underline;
@@ -490,6 +528,7 @@
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
+      max-width: 100%;
     }
 
     .btn-row-copy {
@@ -516,13 +555,21 @@
       font-style: italic;
     }
 
+    .table-container {
+      width: 100%;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      margin-bottom: 24px;
+    }
+
     /* Base62 Decoder Table */
     .data-table {
       width: 100%;
+      min-width: 360px;
       border-collapse: collapse;
       font-family: var(--font-mono);
       font-size: 15px;
-      margin-bottom: 24px;
+      margin-bottom: 0;
     }
 
     .data-table th, .data-table td {
@@ -744,12 +791,12 @@
     /* Responsive */
     @media (max-width: 768px) {
       .hero-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: minmax(0, 1fr);
         gap: 40px;
       }
 
       .two-col {
-        grid-template-columns: 1fr;
+        grid-template-columns: minmax(0, 1fr);
         gap: 24px;
       }
 
@@ -822,7 +869,7 @@
             <span class="ticket-notch ticket-notch-top"></span>
             <span class="ticket-notch ticket-notch-bottom"></span>
             <div class="ticket-main">
-              <div>
+              <div class="ticket-content">
                 <div class="ticket-meta-row">
                   <span class="ticket-tag">Short Link</span>
                   <span class="ticket-status"><span class="status-pulse"></span>ACTIVE IN REDIS</span>
@@ -865,19 +912,21 @@
           <p class="col-desc">Every link gets a number from the database. That number is written in base 62 (0-9, a-z, A-Z) so it stays short.</p>
         </div>
         <div>
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>Character</th>
-                <th>Value</th>
-                <th>Place</th>
-                <th>Adds</th>
-              </tr>
-            </thead>
-            <tbody id="decoderTableBody">
-              <!-- Dynamically populated from ticket's code -->
-            </tbody>
-          </table>
+          <div class="table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Character</th>
+                  <th>Value</th>
+                  <th>Place</th>
+                  <th>Adds</th>
+                </tr>
+              </thead>
+              <tbody id="decoderTableBody">
+                <!-- Dynamically populated from ticket's code -->
+              </tbody>
+            </table>
+          </div>
 
           <div class="try-calc">
             <label for="calcInput" class="try-calc-header">Try a number</label>
